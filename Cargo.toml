@@ -1,0 +1,2 @@
+[workspace]
+members = ["xtask", "hack-new", "hack-new-common"]
