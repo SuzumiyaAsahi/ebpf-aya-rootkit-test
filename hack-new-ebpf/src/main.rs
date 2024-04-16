@@ -92,6 +92,7 @@ fn sys_exit_read_check(ctx: TracePointContext) -> Result<u32, u32> {
                 return Ok(0);
             }
             let _ = bpf_probe_write_user(tmpbuf as *mut c_char, hook.as_ptr());
+            info!(&ctx, "已经成功写入，地址是0x{:x}", { tmpbuf });
         } else {
             return Ok(0);
         }
