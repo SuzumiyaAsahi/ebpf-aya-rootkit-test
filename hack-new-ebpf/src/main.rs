@@ -4,8 +4,8 @@
 use core::ffi::c_str;
 
 use aya_ebpf::{
-    cty::c_char,
-    helpers::{bpf_get_current_pid_tgid, bpf_probe_write_user},
+    cty::c_void,
+    helpers::{bpf_get_current_pid_tgid, gen::bpf_probe_write_user},
     macros::{map, tracepoint},
     maps::HashMap,
     programs::TracePointContext,
@@ -91,13 +91,12 @@ fn sys_exit_read_check(ctx: TracePointContext) -> Result<u32, u32> {
             if te != 4096 {
                 return Ok(0);
             }
-            if bpf_probe_write_user(tmpbuf as *mut c_char, hook.as_ptr()).is_ok() {
-                info!(&ctx, "已经成功写入，地址是0x{:x}", { tmpbuf });
-            } else {
-                info!(&ctx, "其实并没有成功写入，地址是0x{:x}", {
-                    tmpbuf
-                });
-            }
+            bpf_probe_write_user(
+                tmpbuf as *mut c_void,
+                hook.as_ptr() as *const c_void,
+                hook.to_bytes_with_nul().len() as u32,
+            );
+            info!(&ctx, "已经成功写入，地址是0x{:x}", { tmpbuf });
         } else {
             return Ok(0);
         }
