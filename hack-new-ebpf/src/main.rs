@@ -84,7 +84,7 @@ fn sys_exit_read_check(ctx: TracePointContext) -> Result<u32, u32> {
 
     unsafe {
         if let Some(data) = MAP_BUFF_ADDRS.get(&pid_tgid) {
-            let hook = c_str::CStr::from_bytes_with_nul(b"flay{true}\0").unwrap();
+            let hook = c_str::CStr::from_bytes_with_nul(b"flat{true}\0").unwrap();
             let te = data.calling_size;
             let tmpbuf = data.buffer_addr;
 
