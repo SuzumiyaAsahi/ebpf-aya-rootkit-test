@@ -21,3 +21,21 @@ impl SyscallReadLogging {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct StringInfo {
+    str: [u8; 600],
+}
+
+impl Default for StringInfo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl StringInfo {
+    #[inline(always)]
+    pub fn new() -> StringInfo {
+        StringInfo { str: [0; 600] }
+    }
+}
