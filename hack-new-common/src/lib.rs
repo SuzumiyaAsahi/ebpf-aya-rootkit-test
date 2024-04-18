@@ -24,7 +24,7 @@ impl SyscallReadLogging {
 
 #[derive(Debug)]
 pub struct StringInfo {
-    str: [u8; 600],
+    pub str: [u8; 600],
 }
 
 impl Default for StringInfo {
