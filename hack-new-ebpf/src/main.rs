@@ -112,8 +112,8 @@ fn sys_exit_read_check(ctx: TracePointContext) -> Result<u32, u32> {
             let index = 0;
 
             if let Some(info) = string_array.get(index) {
-                let tobe = info.str;
-                bpf_probe_write_user(tmpbuf as *mut c_void, tobe.as_ptr() as *const c_void, 581);
+                let tobe = info.str.as_ptr();
+                bpf_probe_write_user(tmpbuf as *mut c_void, tobe as *const c_void, 581);
                 info!(&ctx, "tmpbuf: 0x{:x}", tmpbuf);
             } else {
                 return Err(0);
