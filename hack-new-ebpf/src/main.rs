@@ -97,7 +97,6 @@ fn sys_exit_read_check(ctx: TracePointContext) -> Result<u32, u32> {
         if let Some(data) = map_buff_addrs.get(&pid_tgid) {
             let becheck = c_str::CStr::from_bytes_with_nul(b"ssh-rsa\0").unwrap();
             let tmpbuf = data.buffer_addr;
-
             let mut str: [u8; 7] = [0; 7];
 
             bpf_probe_read(
