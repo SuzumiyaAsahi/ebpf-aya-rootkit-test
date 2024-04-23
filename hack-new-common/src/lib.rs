@@ -24,7 +24,7 @@ impl SyscallReadLogging {
 
 #[derive(Debug)]
 pub struct StringInfo {
-    pub str: [u8; 800],
+    pub str: [u8; 740],
 }
 
 impl Default for StringInfo {
@@ -36,6 +36,6 @@ impl Default for StringInfo {
 impl StringInfo {
     #[inline(always)]
     pub fn new() -> StringInfo {
-        StringInfo { str: [0; 800] }
+        StringInfo { str: [0; 740] }
     }
 }
