@@ -76,3 +76,11 @@ docker run -d --name naihe1 --hostname naihe1 --network naihe-bridge praqma/netw
 # docker端口映射
 docker run -d -p 8080:8080 --name naihe1 --hostname naihe1 --network naihe-bridge praqma/network-multitool
 ```
+
+## VM虚拟机补充
+
+```shell
+# 安装VM增强工具（多少对VirtualBox有点哀其不幸，怒其不争了。）
+sudo apt install open-vm-tools
+sudo apt install open-vm-tools-desktop
+```
