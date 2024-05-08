@@ -1,6 +1,8 @@
 FROM ubuntu:latest
 
 # 不交互，静默安装
+# 虽说这把没用上，不代表以后用不上，
+# 这个Docker基本满足了我对Rust在Linux开发的需要了
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \

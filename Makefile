@@ -1,2 +1,2 @@
 run:
-	(./target/debug/hack-new &)
+	RUST_LOG=info cargo xtask run

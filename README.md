@@ -27,6 +27,10 @@ RUST_LOG=info cargo xtask run
 
 ## Docker实验环境构建
 
+不过这把没用上Docker，内核的东西使用Docker来模拟确实不太好。
+
+暂时还没想到什么太好的方法。
+
 ### Docker镜像与容器管理
 
 ```shell
