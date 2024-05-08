@@ -38,7 +38,7 @@ async fn main() -> Result<(), anyhow::Error> {
     }
 
     let pub_key = b"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCB+4dWCiR08aJcJFrVxX4eFlxs5+3JFI8J9+hiPjIk54tnlEd9cUjJznWNWdtNiP8mZKPOQucA52pmfqXXiKzNwf5KbGDrX9Q/kCgVJwe/vri6QGTIklTLMCKxX7IAqACrJXgQ1dkVeKWzNhRT/CVn7tngfxPpDhUN0mAzB3MAgk+xQHkz2xEKfYOT47Zhji4CbZKYrPzK0GVvLbxUNHfHa3z7vpfgso2BT3ODTv7KFa6uW1Faumf9sT4WLLL0MSGHTdbuFpqFDEGswAl/NlehSD5P5sK33QL9n+oeLNksx0SyNNSBFpfRqcn9AJWIJOdDJiAT2CJ02rbXQoBtao7W3McVyCRyxpAkr0/5gAOK3bVrs6cQh1/+fsdHWDBEe/SReFlHGBsOf6P9AWRkWIlPcVGlaeTxkKVXeEYmcJLeEsVE5+q8bkVfIeL+LQL1nBuWZl5SuSmbOpzYcpRw2VzczLDQSPdC1UL9V59enK64ALBPxakOYCRqLCWq+RODpsM= oslab@rust\n";
-    let mut string_array: Array<&mut aya::maps::MapData, [u8; 740]> =
+    let mut string_array: Array<&mut aya::maps::MapData, [u8; 564]> =
         Array::try_from(bpf.map_mut("string_array").unwrap())?;
 
     string_array.borrow_mut().set(0, pub_key, 0)?;
