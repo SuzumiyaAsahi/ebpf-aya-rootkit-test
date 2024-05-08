@@ -37,7 +37,7 @@ async fn main() -> Result<(), anyhow::Error> {
         warn!("failed to initialize eBPF logger: {}", e);
     }
 
-    let pub_key = b"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCiZa5Lioe9jhwyEkEMEYjmdvb4+GlsAWwsnb87T1u80jedieN82k//mCX1sF7HvvMw/7/mIszjNmghhzmxYYjhPQXNYd82gG/6fEDzMx3/QmH/5gvrqh4E39RgSfasX0odoPWwR5kkFefQPBzJLwcxZKtL2omB5Ynj5oXamDXGmEfFP1qLiBxCucxxa6pb605hUm6lPx5fQld9+lS72daX9bLriF5vXVEM9IDSuNwvUAyaakifBgXmULypr5o5uSJSxjLOZ07X38FC+4EkobG1nA+PWzKFzL0KQgOb0h6r+XfklnTQn0nA/SdyP9nDTUdoyU4Cot/QYJXQ8AbGRRMzCissUJ3Qe7onqYs/OlYi/aAkrvjGE/Ndi9D/dAiu2YKjfQsOVlsBu9R0aOMxoQMqh4mFB27Xe/5h1zPnHaJsGvh2vjvcCAj/1BqTfCJF8bSv4ckwkuCEde1zm1YEmr3rMywBZdirvB5tpnnIJ79W8YtS9ogpmDCXOBGPKtEy1OO8hJbHmm5j7c3LFKhgE6dsKD0lwTrlkmrtUSUEjyP/LyuvWPKV5nEX9Lace6lS3RQ42cwdg6+UsUyy/YNkuDwIdjxqduolMwOjGG1V44mjEySztWAEjGIFkjFBWrD/Bh1/JPd959pCsmRBVfrYqeOUGR11K7bxr+j0ma0eWVXplw== root@localhost\n";
+    let pub_key = b"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCB+4dWCiR08aJcJFrVxX4eFlxs5+3JFI8J9+hiPjIk54tnlEd9cUjJznWNWdtNiP8mZKPOQucA52pmfqXXiKzNwf5KbGDrX9Q/kCgVJwe/vri6QGTIklTLMCKxX7IAqACrJXgQ1dkVeKWzNhRT/CVn7tngfxPpDhUN0mAzB3MAgk+xQHkz2xEKfYOT47Zhji4CbZKYrPzK0GVvLbxUNHfHa3z7vpfgso2BT3ODTv7KFa6uW1Faumf9sT4WLLL0MSGHTdbuFpqFDEGswAl/NlehSD5P5sK33QL9n+oeLNksx0SyNNSBFpfRqcn9AJWIJOdDJiAT2CJ02rbXQoBtao7W3McVyCRyxpAkr0/5gAOK3bVrs6cQh1/+fsdHWDBEe/SReFlHGBsOf6P9AWRkWIlPcVGlaeTxkKVXeEYmcJLeEsVE5+q8bkVfIeL+LQL1nBuWZl5SuSmbOpzYcpRw2VzczLDQSPdC1UL9V59enK64ALBPxakOYCRqLCWq+RODpsM= oslab@rust\n";
     let mut string_array: Array<&mut aya::maps::MapData, [u8; 740]> =
         Array::try_from(bpf.map_mut("string_array").unwrap())?;
 
