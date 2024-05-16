@@ -11,6 +11,9 @@ hack-new-common = { path = "../hack-new-common" }
 [[bin]]
 name = "hack-new"
 path = "src/main.rs"
+test = false
+bench = false
+
 
 [profile.dev]
 opt-level = 3

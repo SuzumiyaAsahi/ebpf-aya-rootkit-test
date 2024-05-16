@@ -1,28 +1,46 @@
 # hack-new
 
-## Prerequisites
-
-1. Install bpf-linker: `cargo install bpf-linker`
-
-## Build eBPF
-
-```bash
-cargo xtask build-ebpf
-```
-
-To perform a release build you can use the `--release` flag.
-You may also change the target architecture with the `--target` flag.
-
-## Build Userspace
-
-```bash
-cargo build
-```
-
 ## Run
 
 ```bash
-RUST_LOG=info cargo xtask run
+make run
+```
+
+## sys_enter_read参数读取
+
+```rust
+    unsafe {
+        // 这些参数都是哪里来的？
+        //field:char * buf; offset:24; size:8; signed:0;
+        let buff_addr: u64 = ctx.read_at(24).unwrap();
+
+        //field:size_t count; offset:32; size:8; signed:0;
+        let size: u64 = ctx.read_at(32).unwrap();
+
+        data.buffer_addr = buff_addr;
+
+        data.calling_size = size;
+    }
+```
+
+这些参数都是这么来滴！
+
+```bash
+# cat /sys/kernel/debug/tracing/events/syscalls/sys_enter_read/format
+name: sys_enter_read
+ID: 680
+format:
+        field:unsigned short common_type;       offset:0;       size:2; signed:0;
+        field:unsigned char common_flags;       offset:2;       size:1; signed:0;
+        field:unsigned char common_preempt_count;       offset:3;       size:1; signed:0;
+        field:int common_pid;   offset:4;       size:4; signed:1;
+
+        field:int __syscall_nr; offset:8;       size:4; signed:1;
+        field:unsigned int fd;  offset:16;      size:8; signed:0;
+        field:char * buf;       offset:24;      size:8; signed:0;
+        field:size_t count;     offset:32;      size:8; signed:0;
+
+print fmt: "fd: 0x%08lx, buf: 0x%08lx, count: 0x%08lx", ((unsigned long)(REC->fd)), ((unsigned long)(REC->buf)), ((unsigned long)(REC->count))
 ```
 
 ## Docker实验环境构建
